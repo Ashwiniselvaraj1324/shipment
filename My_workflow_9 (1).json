@@ -1,0 +1,397 @@
+{
+  "name": "My workflow 9",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            },
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "7d13509c-ee2c-4cd1-b802-f02cd69c3d63",
+      "name": "Schedule Trigger",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "594e9482-a398-49a4-b5ad-fa2646f31b49",
+              "name": "trackingId",
+              "value": "AB123456789",
+              "type": "string"
+            },
+            {
+              "id": "29f5d3c3-08d9-454a-9198-e4888580c35b",
+              "name": "carrier",
+              "value": "TestCarrier",
+              "type": "string"
+            },
+            {
+              "id": "dcfc405d-6b93-425e-9863-2ca28fe59c44",
+              "name": "expected DeliveryDate",
+              "value": "={[] $now.addDays(1).toISO() ]}",
+              "type": "string"
+            },
+            {
+              "id": "c74abc05-2eae-4b4e-8315-44d512cf954c",
+              "name": "status",
+              "value": "in_transit ",
+              "type": "string"
+            },
+            {
+              "id": "5c827b28-98d2-45af-993c-4d330cb0932a",
+              "name": "notify alert",
+              "value": "ashwini.s.dtywings@snsgroups.com",
+              "type": "string"
+            },
+            {
+              "id": "a33e9c45-c55c-4519-8129-2c1b67b51695",
+              "name": "escalate - delayed ",
+              "value": "reason ",
+              "type": "string"
+            },
+            {
+              "id": "5ae4c3ab-2964-4e76-b777-a727ddaca4f3",
+              "name": "delivered",
+              "value": "feed back & suggestion",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "8ea06ad3-745c-4f78-acc3-58001cfcd9a2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://admin.aftership.com/organization/6••••••••••••b37dc9",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "aftership-api-key",
+              "value": "asat_6••••••••••••b37dc9"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "YES",
+              "value": "aftership-api-key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "9424a8a9-d872-45b0-b1f3-3f4f7117336f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4ac9138e-1dd7-4bdf-ae93-c2aea570cd5f",
+              "leftValue": "=status",
+              "rightValue": "delayed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "39c6a9a6-192e-4b91-a27e-d631b2ebc08a",
+              "leftValue": "status",
+              "rightValue": "delivered",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "1d91f8f3-8d52-4b39-9939-1b341d93508d",
+      "name": "If",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "ashwini.s.dtywings@snsgroups.com",
+        "subject": "Shipment Delayed",
+        "emailType": "text",
+        "message": "=Your shipment is delayed due to the weather condition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        -100
+      ],
+      "id": "f7e354f0-045c-45f6-90ae-f9e27a401969",
+      "name": "Gmail",
+      "webhookId": "a3a04aeb-3533-4af6-9101-783660d842be",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MXzPPw4BL9eswq1J",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ashwini.s.dtywings@snsgroups.com",
+        "subject": "delivery of goods ",
+        "emailType": "text",
+        "message": "Dear customer your product has been delivered successfully , feel free to provide your suggestion ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        100
+      ],
+      "id": "ad097779-666f-4f14-9abd-c98fdd29e740",
+      "name": "Gmail1",
+      "webhookId": "639f9f64-9ed8-428f-bc65-b7d695d3b8dc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MXzPPw4BL9eswq1J",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Hello , shipmenttrack . Here are your track details provided ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        20
+      ],
+      "id": "b4ca3bf8-23ba-4005-a034-a06106ff9429",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        236
+      ],
+      "id": "f2953cc4-62ac-4423-88b6-36c07413efb7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ZOgZPDwthvSHi662",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "https://www.notion.so/Welcome-to-Notion-215b888fd9de800786e4f21a52f0e73b?pvs=12",
+          "mode": "url"
+        },
+        "title": "tracking goods",
+        "options": {
+          "iconType": "file"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1480,
+        20
+      ],
+      "id": "2ebf690a-dd2a-46bf-b069-60f7b79c3a80",
+      "name": "Notion",
+      "credentials": {
+        "notionApi": {
+          "id": "ko2eVPvemdBtjVOd",
+          "name": "Notion account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f0bb3f0c-8ef0-4357-ac0b-07db7e909df0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eb16799efd3d8b80a767befdfcef352cd7c0dfa04e4bdf32115210d9e4f43684"
+  },
+  "id": "27tsEPLUJVPIEyQv",
+  "tags": []
+}
